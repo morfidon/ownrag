@@ -101,9 +101,39 @@ rag.ingest_file("doc.pdf", chunk_size=1000)
 rag.ingest_file("doc.pdf", chunk_overlap=100)
 ```
 
-**Results per query**: How many chunks to use (default: 3)
+**Results per query (top_k)**: How many chunks to use (default: 3)
+
+`top_k=3` means the system retrieves the 3 most relevant chunks to answer your question.
+
+**How it works:**
+1. You ask a question
+2. The retriever finds all possible matches
+3. `top_k` decides how many of the best ones go to the model
+
+**Why 3?**
+- 1-2 chunks might miss context
+- 5-10 chunks might overload with noise
+- 3 gives enough info without bloating the prompt
+
+**When to adjust:**
+
+*Chunk size:*
+- Small chunks → raise to 5-10
+- Large chunks → lower to 1-3
+
+*Question type:*
+- Simple question → smaller top_k
+- Broad question → larger top_k
+
+*Model limits:*
+- Small token window → lower top_k to avoid overflow
+
 ```python
-rag = RAGSystem(top_k=5)
+# Simple questions
+rag = RAGSystem(top_k=2)
+
+# Complex questions needing more context
+rag = RAGSystem(top_k=7)
 ```
 
 ## Cost
