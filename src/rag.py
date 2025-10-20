@@ -20,7 +20,7 @@ class RAGSystem:
         Initialize the RAG system.
         
         Args:
-            persist_directory: Directory to persist ChromaDB data
+            persist_directory: Directory to persist ChromaDB data 
             top_k: Number of relevant chunks to retrieve for queries
         """
         self.persist_directory = persist_directory
