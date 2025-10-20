@@ -12,6 +12,8 @@ Ask questions about your documents. The system reads PDFs, stores them in a data
 
 ## Install
 
+📹 **[Watch installation video](./assets/own-rag.mp4)**
+
 ```powershell
 
 pip install -r requirements.txt
