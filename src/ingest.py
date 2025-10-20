@@ -198,9 +198,7 @@ class DocumentIngestor:
             print(f"Skipping {Path(file_path).name} (already ingested)")
             return None
         
-        print(f"\n{'='*60}")
-        print(f"Ingesting: {Path(file_path).name}")
-        print(f"{'='*60}\n")
+        print(f"\nIngesting: {Path(file_path).name}")
         
         # Load document
         documents = self.load_document(file_path)
@@ -214,9 +212,7 @@ class DocumentIngestor:
         # Mark as ingested
         self._mark_file_ingested(file_path)
         
-        print(f"\n{'='*60}")
-        print(f"Ingestion Complete!")
-        print(f"{'='*60}\n")
+        print(f"Ingestion complete.\n")
         
         return vectorstore
     
@@ -242,9 +238,7 @@ class DocumentIngestor:
         
         extensions = extensions or self.SUPPORTED_EXTENSIONS
         
-        print(f"\n{'='*60}")
-        print(f"Scanning folder: {folder_path}")
-        print(f"{'='*60}\n")
+        print(f"\nScanning folder: {folder_path}")
         
         # Find all supported files
         files_to_process = []
@@ -269,12 +263,9 @@ class DocumentIngestor:
             else:
                 skipped_count += 1
         
-        print(f"\n{'='*60}")
-        print(f"Folder Ingestion Summary")
-        print(f"{'='*60}")
-        print(f"Ingested: {ingested_count} file(s)")
-        print(f"Skipped: {skipped_count} file(s) (already processed)")
-        print(f"{'='*60}\n")
+        print(f"\nFolder ingestion summary:")
+        print(f"  Ingested: {ingested_count} file(s)")
+        print(f"  Skipped: {skipped_count} file(s) (already processed)\n")
         
         return self.load_existing_vectorstore()
     

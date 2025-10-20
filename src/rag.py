@@ -137,9 +137,7 @@ class RAGSystem:
 
 def main():
     """Example usage demonstrating the complete RAG workflow."""
-    print("\n" + "="*60)
-    print("RAG System Demo")
-    print("="*60 + "\n")
+    print("\nRAG System Demo\n")
     
     # Initialize RAG system
     rag = RAGSystem(persist_directory="./chroma_db", top_k=3)
@@ -148,13 +146,13 @@ def main():
     pdf_path = "./data/DataMind_FAQ_EN.pdf"
     
     if not rag.is_vectorstore_ready():
-        print("⚠️  Vector store not found. Ingesting PDF...\n")
+        print("Vector store not found. Ingesting PDF...\n")
         if not os.path.exists(pdf_path):
-            print(f"❌ Error: PDF not found at {pdf_path}")
+            print(f"Error: PDF not found at {pdf_path}")
             sys.exit(1)
         rag.ingest_pdf(pdf_path)
     else:
-        print("✓ Vector store found. Ready for queries!\n")
+        print("Vector store found. Ready for queries!\n")
     
     # Example questions
     questions = [
@@ -163,31 +161,25 @@ def main():
         "What are the pricing options?"
     ]
     
-    print("\n" + "="*60)
-    print("Running Example Queries")
-    print("="*60 + "\n")
+    print("\nRunning example queries:\n")
     
     for i, question in enumerate(questions, 1):
-        print(f"\n{'─'*60}")
-        print(f"Query {i}: {question}")
-        print('─'*60)
+        print(f"\nQuery {i}: {question}")
         
         try:
             result = rag.ask(question, verbose=False)
             
-            print(f"\n📝 Answer:")
+            print(f"\nAnswer:")
             print(result['answer'])
             
-            print(f"\n📚 Sources:")
+            print(f"\nSources:")
             for j, source in enumerate(result['sources'], 1):
                 print(f"  [{j}] Page {source['page']}")
             
         except Exception as e:
-            print(f"❌ Error: {e}")
+            print(f"Error: {e}")
     
-    print("\n" + "="*60)
-    print("Demo Complete!")
-    print("="*60 + "\n")
+    print("\nDemo complete.\n")
 
 
 if __name__ == "__main__":

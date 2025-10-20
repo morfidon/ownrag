@@ -192,7 +192,7 @@ def main():
     # Initialize query engine
     print("Initializing RAG Query Engine...")
     engine = RAGQueryEngine(persist_directory="./chroma_db", top_k=3)
-    print("✓ Query engine ready!\n")
+    print("Query engine ready!\n")
     
     # Example questions
     questions = [
