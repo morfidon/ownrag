@@ -13,12 +13,16 @@ Ask questions about your documents. The system reads PDFs, stores them in a data
 ## Install
 
 ```powershell
-python -m venv venv
-.\venv\Scripts\Activate.ps1
+
 pip install -r requirements.txt
 ```
 
-Add your OpenAI key to `.env`:
+Create `.env` file from template:
+```powershell
+Copy-Item .env.example .env
+```
+
+Edit `.env` and add your OpenAI API key:
 ```
 OPENAI_API_KEY=your-key-here
 ```
