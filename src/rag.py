@@ -8,8 +8,13 @@ import sys
 from pathlib import Path
 from typing import Dict, Optional
 
-from .ingest import DocumentIngestor
-from .query import RAGQueryEngine
+# Add project root to path when running as script
+if __name__ == "__main__":
+    project_root = Path(__file__).parent.parent
+    sys.path.insert(0, str(project_root))
+
+from src.ingest import DocumentIngestor
+from src.query import RAGQueryEngine
 
 
 class RAGSystem:
@@ -70,7 +75,6 @@ class RAGSystem:
         self.ingest_file(pdf_path, chunk_size, chunk_overlap)
         
     def is_vectorstore_ready(self) -> bool:
-        """Check if vector store exists and is ready for queries."""
         return os.path.exists(self.persist_directory)
     
     def ask(self, question: str, verbose: bool = False) -> Dict[str, any]:
@@ -126,12 +130,6 @@ class RAGSystem:
         return self.query_engine.get_relevant_chunks(question, k)
     
     def get_ingested_files(self) -> dict:
-        """
-        Get list of all ingested files.
-        
-        Returns:
-            Dictionary mapping file paths to their hashes
-        """
         return self.ingestor.get_ingested_files()
 
 
@@ -142,17 +140,18 @@ def main():
     # Initialize RAG system
     rag = RAGSystem(persist_directory="./chroma_db", top_k=3)
     
-    # Check if we need to ingest
-    pdf_path = "./data/DataMind_FAQ_EN.pdf"
+    # Ingest all files in data folder (only new/modified files)
+    print("Ingesting documents from ./data folder...\n")
+    rag.ingest_folder("./data")
     
-    if not rag.is_vectorstore_ready():
-        print("Vector store not found. Ingesting PDF...\n")
-        if not os.path.exists(pdf_path):
-            print(f"Error: PDF not found at {pdf_path}")
-            sys.exit(1)
-        rag.ingest_pdf(pdf_path)
-    else:
-        print("Vector store found. Ready for queries!\n")
+    # Show ingested files
+    ingested = rag.get_ingested_files()
+    if ingested:
+        print(f"\nTotal ingested files: {len(ingested)}")
+        for file_path in ingested:
+            print(f"   - {Path(file_path).name}")
+    
+    print("\nReady for queries!\n")
     
     # Example questions
     questions = [

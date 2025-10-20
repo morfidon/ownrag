@@ -4,8 +4,15 @@ Handles question answering using ChromaDB retrieval and OpenAI chat completion.
 """
 
 import os
+import sys
+from pathlib import Path
 from typing import List, Dict, Optional
 from dotenv import load_dotenv
+
+# Add project root to path when running as script
+if __name__ == "__main__":
+    project_root = Path(__file__).parent.parent
+    sys.path.insert(0, str(project_root))
 
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_chroma import Chroma
@@ -53,7 +60,6 @@ class RAGQueryEngine:
         self.qa_chain = self._create_qa_chain()
     
     def _load_vectorstore(self) -> Chroma:
-        """Load existing ChromaDB vector store."""
         if not os.path.exists(self.persist_directory):
             raise FileNotFoundError(
                 f"Vector store not found at {self.persist_directory}. "
@@ -68,8 +74,6 @@ class RAGQueryEngine:
         return vectorstore
     
     def _create_qa_chain(self) -> RetrievalQA:
-        """Create LangChain RetrievalQA chain with custom prompt."""
-        
         # Custom prompt template
         prompt_template = """You are a helpful AI assistant answering questions based on the provided context.
 

@@ -5,11 +5,17 @@ Tracks ingested files to avoid re-processing.
 """
 
 import os
+import sys
 import json
 import hashlib
 from pathlib import Path
 from typing import List, Dict, Set, Optional
 from dotenv import load_dotenv
+
+# Add project root to path when running as script
+if __name__ == "__main__":
+    project_root = Path(__file__).parent.parent
+    sys.path.insert(0, str(project_root))
 
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -45,7 +51,6 @@ class DocumentIngestor:
         )
         
     def _get_file_hash(self, file_path: str) -> str:
-        """Calculate MD5 hash of file for change detection."""
         hash_md5 = hashlib.md5()
         with open(file_path, "rb") as f:
             for chunk in iter(lambda: f.read(4096), b""):
@@ -53,20 +58,17 @@ class DocumentIngestor:
         return hash_md5.hexdigest()
     
     def _load_tracking_data(self) -> Dict[str, str]:
-        """Load tracking data of ingested files."""
         if os.path.exists(self.tracking_file):
             with open(self.tracking_file, 'r') as f:
                 return json.load(f)
         return {}
     
     def _save_tracking_data(self, tracking_data: Dict[str, str]) -> None:
-        """Save tracking data of ingested files."""
         os.makedirs(self.persist_directory, exist_ok=True)
         with open(self.tracking_file, 'w') as f:
             json.dump(tracking_data, f, indent=2)
     
     def _is_file_ingested(self, file_path: str) -> bool:
-        """Check if file has already been ingested and hasn't changed."""
         tracking_data = self._load_tracking_data()
         file_path = str(Path(file_path).resolve())
         
@@ -77,7 +79,6 @@ class DocumentIngestor:
         return tracking_data[file_path] == current_hash
     
     def _mark_file_ingested(self, file_path: str) -> None:
-        """Mark file as ingested with its current hash."""
         tracking_data = self._load_tracking_data()
         resolved_path = str(Path(file_path).resolve())
         
@@ -294,11 +295,9 @@ class DocumentIngestor:
         return vectorstore
     
     def get_ingested_files(self) -> Dict[str, str]:
-        """Get list of all ingested files with their hashes."""
         return self._load_tracking_data()
     
     def clear_tracking(self) -> None:
-        """Clear file tracking data (useful for forcing re-ingestion)."""
         if os.path.exists(self.tracking_file):
             os.remove(self.tracking_file)
             print("Cleared file tracking data")
