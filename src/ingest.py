@@ -146,6 +146,30 @@ class DocumentIngestor:
         print(f"Created {len(chunks)} chunks (size={chunk_size}, overlap={chunk_overlap})")
         return chunks
     
+    def _delete_file_chunks(self, file_name: str) -> None:
+        """
+        Delete all chunks associated with a specific file from the vector store.
+        
+        Args:
+            file_name: Name of the file whose chunks should be deleted
+        """
+        if not os.path.exists(self.persist_directory):
+            return
+        
+        vectorstore = Chroma(
+            persist_directory=self.persist_directory,
+            embedding_function=self.embeddings
+        )
+        
+        # Get all documents with this source file
+        try:
+            results = vectorstore.get(where={"source_file": file_name})
+            if results and results['ids']:
+                vectorstore.delete(ids=results['ids'])
+                print(f"Deleted {len(results['ids'])} old chunks from {file_name}")
+        except Exception as e:
+            print(f"Warning: Could not delete old chunks: {e}")
+    
     def create_or_update_vector_store(self, chunks: List[Document]) -> Chroma:
         """
         Create or update ChromaDB vector store with document chunks.
@@ -182,6 +206,7 @@ class DocumentIngestor:
         """
         Ingest a single file: load → chunk → embed → store.
         Skips if already ingested unless force=True.
+        If file was modified, deletes old chunks before adding new ones.
         
         Args:
             file_path: Path to file
@@ -193,13 +218,23 @@ class DocumentIngestor:
             Chroma vector store instance or None if skipped
         """
         file_path = str(Path(file_path).resolve())
+        file_name = Path(file_path).name
         
         # Check if already ingested
-        if not force and self._is_file_ingested(file_path):
-            print(f"Skipping {Path(file_path).name} (already ingested)")
+        is_already_ingested = self._is_file_ingested(file_path)
+        tracking_data = self._load_tracking_data()
+        is_tracked = file_path in tracking_data
+        
+        if not force and is_already_ingested:
+            print(f"Skipping {file_name} (already ingested)")
             return None
         
-        print(f"\nIngesting: {Path(file_path).name}")
+        # If file was previously ingested but hash changed, delete old chunks
+        if is_tracked and not is_already_ingested:
+            print(f"\nRe-ingesting modified file: {file_name}")
+            self._delete_file_chunks(file_name)
+        else:
+            print(f"\nIngesting: {file_name}")
         
         # Load document
         documents = self.load_document(file_path)
