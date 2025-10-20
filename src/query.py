@@ -41,7 +41,7 @@ class RAGQueryEngine:
         
         # Initialize LLM
         self.llm = ChatOpenAI(
-            model="gpt-4o-mini",
+            model="gpt-5-nano",
             temperature=0,
             openai_api_key=self.api_key
         )

@@ -83,7 +83,7 @@ class DocumentIngestor:
         
         # Check if file exists before hashing
         if not os.path.exists(resolved_path):
-            print(f"⚠️  Warning: File not found for tracking: {resolved_path}")
+            print(f"Warning: File not found for tracking: {resolved_path}")
             return
         
         file_hash = self._get_file_hash(resolved_path)
@@ -119,7 +119,7 @@ class DocumentIngestor:
             doc.metadata['source_file'] = Path(file_path).name
             doc.metadata['file_type'] = file_ext
         
-        print(f"✓ Loaded {len(documents)} page(s)/section(s) from {Path(file_path).name}")
+        print(f"Loaded {len(documents)} page(s)/section(s) from {Path(file_path).name}")
         return documents
     
     def chunk_documents(self, documents: List[Document], chunk_size: int = 500, chunk_overlap: int = 50) -> List[Document]:
@@ -142,7 +142,7 @@ class DocumentIngestor:
         )
         
         chunks = text_splitter.split_documents(documents)
-        print(f"✓ Created {len(chunks)} chunks (size={chunk_size}, overlap={chunk_overlap})")
+        print(f"Created {len(chunks)} chunks (size={chunk_size}, overlap={chunk_overlap})")
         return chunks
     
     def create_or_update_vector_store(self, chunks: List[Document]) -> Chroma:
@@ -155,7 +155,7 @@ class DocumentIngestor:
         Returns:
             Chroma vector store instance
         """
-        print(f"⏳ Generating embeddings and storing in ChromaDB...")
+        print(f"Generating embeddings and storing in ChromaDB...")
         
         if os.path.exists(self.persist_directory):
             # Load existing and add new chunks
@@ -164,7 +164,7 @@ class DocumentIngestor:
                 embedding_function=self.embeddings
             )
             vectorstore.add_documents(chunks)
-            print(f"✓ Added {len(chunks)} chunks to existing vector store")
+            print(f"Added {len(chunks)} chunks to existing vector store")
         else:
             # Create new vector store
             vectorstore = Chroma.from_documents(
@@ -172,9 +172,9 @@ class DocumentIngestor:
                 embedding=self.embeddings,
                 persist_directory=self.persist_directory
             )
-            print(f"✓ Created new vector store with {len(chunks)} chunks")
+            print(f"Created new vector store with {len(chunks)} chunks")
         
-        print(f"✓ Persisted to: {self.persist_directory}")
+        print(f"Persisted to: {self.persist_directory}")
         return vectorstore
     
     def ingest_file(self, file_path: str, chunk_size: int = 500, chunk_overlap: int = 50, force: bool = False) -> Optional[Chroma]:
@@ -195,7 +195,7 @@ class DocumentIngestor:
         
         # Check if already ingested
         if not force and self._is_file_ingested(file_path):
-            print(f"⏭️  Skipping {Path(file_path).name} (already ingested)")
+            print(f"Skipping {Path(file_path).name} (already ingested)")
             return None
         
         print(f"\n{'='*60}")
@@ -215,7 +215,7 @@ class DocumentIngestor:
         self._mark_file_ingested(file_path)
         
         print(f"\n{'='*60}")
-        print(f"✓ Ingestion Complete!")
+        print(f"Ingestion Complete!")
         print(f"{'='*60}\n")
         
         return vectorstore
@@ -252,7 +252,7 @@ class DocumentIngestor:
             files_to_process.extend(folder_path.glob(f"*{ext}"))
         
         if not files_to_process:
-            print(f"⚠️  No supported files found in {folder_path}")
+            print(f"No supported files found in {folder_path}")
             print(f"   Supported extensions: {extensions}")
             return self.load_existing_vectorstore()
         
@@ -272,8 +272,8 @@ class DocumentIngestor:
         print(f"\n{'='*60}")
         print(f"Folder Ingestion Summary")
         print(f"{'='*60}")
-        print(f"✓ Ingested: {ingested_count} file(s)")
-        print(f"⏭️  Skipped: {skipped_count} file(s) (already processed)")
+        print(f"Ingested: {ingested_count} file(s)")
+        print(f"Skipped: {skipped_count} file(s) (already processed)")
         print(f"{'='*60}\n")
         
         return self.load_existing_vectorstore()
@@ -299,7 +299,7 @@ class DocumentIngestor:
             embedding_function=self.embeddings
         )
         
-        print(f"✓ Loaded existing vector store from {self.persist_directory}")
+        print(f"Loaded existing vector store from {self.persist_directory}")
         return vectorstore
     
     def get_ingested_files(self) -> Dict[str, str]:
@@ -310,7 +310,7 @@ class DocumentIngestor:
         """Clear file tracking data (useful for forcing re-ingestion)."""
         if os.path.exists(self.tracking_file):
             os.remove(self.tracking_file)
-            print("✓ Cleared file tracking data")
+            print("Cleared file tracking data")
 
 
 # Backward compatibility alias
