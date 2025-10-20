@@ -52,6 +52,13 @@ python test_rag.py
 
 **Smart tracking**: Skips files you already loaded
 
+**Auto-update on changes**: When you modify a file, old chunks are automatically deleted and replaced with new ones
+```python
+# Edit additional_info.txt, then run:
+rag.ingest_folder("./data")
+# Old chunks deleted, new chunks added automatically
+```
+
 **Folder ingestion**: Load all files at once
 ```python
 rag.ingest_folder("./data")
